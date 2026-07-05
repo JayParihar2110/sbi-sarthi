@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SBI Sarthi · Autonomous Agentic Banking Companion — Live Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#0E1234; --navy2:#161C46; --panel:#1A2150; --line:#2A3170;
+    --blue:#2D6CDF; --blue-lt:#6FA0F5; --saffron:#F5A623; --teal:#24C4A8;
+    --ink:#12162E; --mute:#93A0C9; --mute2:#5B6182; --cloud:#F4F6FB; --white:#fff;
+    --ok:#24C4A8; --warn:#F5A623;
+    --shadow:0 18px 50px rgba(6,10,32,.45);
+    --r:16px;
+    --agent-orch:#6FA0F5; --agent-acq:#5B8DEF; --agent-adopt:#F5A623;
+    --agent-engage:#F27E86; --agent-advise:#8B7BF0; --agent-comp:#24C4A8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%, #1a2153 0%, var(--navy) 55%) fixed, var(--navy);
+    color:#EAF0FF; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .serif{font-family:'Fraunces',Georgia,serif}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+  /* ---------- Top bar ---------- */
+  header{
+    display:flex;align-items:center;gap:18px;padding:16px 30px;
+    border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;
+    background:rgba(14,18,52,.82);backdrop-filter:blur(10px);
+  }
+  .logo{display:flex;align-items:center;gap:12px}
+  .wheel{width:38px;height:38px;position:relative;flex:0 0 auto}
+  .wheel .rim{position:absolute;inset:0;border-radius:50%;border:2px solid var(--line)}
+  .wheel .hub{position:absolute;inset:34%;border-radius:50%;background:var(--blue);box-shadow:0 0 12px rgba(45,108,223,.8)}
+  .wheel i{position:absolute;left:50%;top:50%;width:2px;height:15px;background:var(--line);transform-origin:top center}
+  .wheel .dot{position:absolute;width:6px;height:6px;border-radius:50%}
+  .brand h1{font-size:19px;font-weight:700;letter-spacing:.2px}
+  .brand h1 .s{color:var(--saffron)}
+  .brand p{font-size:11.5px;color:var(--mute);margin-top:1px;letter-spacing:.3px}
+  .live-badge{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--teal);
+    border:1px solid rgba(36,196,168,.35);padding:6px 12px;border-radius:20px;background:rgba(36,196,168,.08)}
+  .live-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(36,196,168,.6)}70%{box-shadow:0 0 0 8px rgba(36,196,168,0)}100%{box-shadow:0 0 0 0 rgba(36,196,168,0)}}
+  .lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;font-size:12px;font-weight:600}
+  .lang-toggle button{background:none;border:none;color:var(--mute);padding:6px 13px;cursor:pointer;font-family:inherit}
+  .lang-toggle button.on{background:var(--blue);color:#fff}
+
+  /* ---------- Layout ---------- */
+  .stage{display:grid;grid-template-columns:380px 1fr;gap:26px;padding:26px 30px 40px;max-width:1360px;margin:0 auto;align-items:start}
+
+  /* ---------- Phone ---------- */
+  .phone{background:#080B22;border:1px solid var(--line);border-radius:34px;padding:12px;box-shadow:var(--shadow);position:sticky;top:96px}
+  .phone-screen{background:linear-gradient(180deg,#0F1748 0%,#0B1030 30%);border-radius:24px;height:640px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+  .yono-top{padding:16px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .yono-top .ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--saffron));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .yono-top .tt{font-size:14px;font-weight:700}
+  .yono-top .st{font-size:10.5px;color:var(--teal);display:flex;align-items:center;gap:5px}
+  .yono-top .st .d{width:6px;height:6px;border-radius:50%;background:var(--teal)}
+  .yono-brand{margin-left:auto;font-size:10px;color:var(--mute2);text-align:right;line-height:1.3}
+  .chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:11px;scroll-behavior:smooth}
+  .chat::-webkit-scrollbar{width:5px}.chat::-webkit-scrollbar-thumb{background:#2a3170;border-radius:3px}
+  .bubble{max-width:83%;padding:10px 13px;border-radius:15px;font-size:13px;line-height:1.45;animation:rise .35s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .b-sarthi{align-self:flex-start;background:#182155;border:1px solid #26307a;border-top-left-radius:5px}
+  .b-user{align-self:flex-end;background:var(--blue);border-top-right-radius:5px;color:#fff}
+  .b-sys{align-self:center;font-size:10.5px;color:var(--saffron);background:rgba(245,166,35,.09);border:1px solid rgba(245,166,35,.3);
+    padding:7px 12px;border-radius:12px;text-align:center;max-width:94%;line-height:1.4}
+  .voice-tag{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;color:var(--saffron);margin-bottom:5px;font-weight:600;letter-spacing:.3px}
+  .wave{display:inline-flex;gap:2px;align-items:flex-end;height:11px}
+  .wave span{width:2px;background:var(--saffron);border-radius:2px;animation:wv .9s infinite ease-in-out}
+  .wave span:nth-child(1){height:5px;animation-delay:0s}.wave span:nth-child(2){height:10px;animation-delay:.15s}
+  .wave span:nth-child(3){height:6px;animation-delay:.3s}.wave span:nth-child(4){height:9px;animation-delay:.45s}
+  @keyframes wv{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+  .typing{align-self:flex-start;background:#182155;border:1px solid #26307a;padding:11px 15px;border-radius:15px;border-top-left-radius:5px;display:flex;gap:4px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--mute);animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  /* ---------- Console ---------- */
+  .console{display:flex;flex-direction:column;gap:18px}
+  .scn-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .scn-head .lbl{font-size:11px;letter-spacing:2px;color:var(--mute2);font-weight:700}
+  .chips{display:flex;gap:9px;flex-wrap:wrap}
+  .chip{background:var(--panel);border:1px solid var(--line);color:#D6DEF7;padding:9px 15px;border-radius:11px;
+    font-size:12.5px;font-weight:600;cursor:pointer;transition:.18s;display:flex;align-items:center;gap:8px}
+  .chip:hover{border-color:var(--blue)}
+  .chip.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 18px rgba(45,108,223,.35)}
+  .chip .pill{font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.14);font-weight:700}
+
+  .controls{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .btn{background:var(--panel);border:1px solid var(--line);color:#EAF0FF;padding:9px 16px;border-radius:10px;
+    font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;transition:.15s}
+  .btn:hover{border-color:var(--blue-lt)}
+  .btn.primary{background:var(--saffron);border-color:var(--saffron);color:#20160a}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* agent fleet */
+  .panel{background:linear-gradient(180deg,var(--navy2),#12183c);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+  .panel-h{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:1.5px;color:var(--mute);font-weight:700;margin-bottom:14px;text-transform:uppercase}
+  .panel-h .ic{width:7px;height:7px;border-radius:2px;background:var(--blue)}
+  .fleet{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+  .agent{border:1px solid var(--line);border-radius:13px;padding:13px 13px;background:#121740;position:relative;transition:.25s;overflow:hidden}
+  .agent .nm{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .agent .rl{font-size:10.5px;color:var(--mute2);margin-top:4px;line-height:1.35}
+  .agent .orb{width:11px;height:11px;border-radius:50%;flex:0 0 auto;background:#39427f;transition:.25s}
+  .agent.active{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 10px 26px rgba(0,0,0,.4);transform:translateY(-2px);background:#161d54}
+  .agent.active .orb{background:var(--acc);box-shadow:0 0 14px var(--acc);animation:pulseA 1s infinite}
+  .agent.done .orb{background:var(--teal)}
+  @keyframes pulseA{0%,100%{opacity:1}50%{opacity:.5}}
+  .agent .work{font-size:9.5px;color:var(--acc);margin-top:8px;min-height:12px;font-weight:600;opacity:0;transition:.2s}
+  .agent.active .work{opacity:1}
+
+  /* trace */
+  .trace-wrap{background:#0B0F2E;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .trace-top{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--mute);letter-spacing:1px;font-weight:700}
+  .trace-top .dots{display:flex;gap:6px}.trace-top .dots i{width:9px;height:9px;border-radius:50%}
+  .trace{height:250px;overflow-y:auto;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:11.7px;line-height:1.5}
+  .trace::-webkit-scrollbar{width:6px}.trace::-webkit-scrollbar-thumb{background:#2a3170;border-radius:3px}
+  .tr{display:flex;gap:10px;padding:5px 0;animation:rise .3s both;align-items:baseline}
+  .tr .tag{flex:0 0 auto;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.4px}
+  .tr .msg{color:#C7D2F5;flex:1}
+  .tr .msg b{color:#fff}
+  .tr.kind-tool .msg{color:#9fb4e8}
+  .tr.kind-rag .msg{color:#c3b3f5}
+  .tr.pass .msg{color:#8fe6d3}
+  .t-orch{background:rgba(111,160,245,.16);color:#9dc0ff}
+  .t-acq{background:rgba(91,141,239,.16);color:#8fb2ff}
+  .t-adopt{background:rgba(245,166,35,.16);color:#f7c473}
+  .t-engage{background:rgba(242,126,134,.16);color:#f7a6ab}
+  .t-advise{background:rgba(139,123,240,.16);color:#b7acf7}
+  .t-comp{background:rgba(36,196,168,.16);color:#7fe6d1}
+  .t-sys{background:rgba(147,160,201,.14);color:#aab6db}
+  .cursor{display:inline-block;width:7px;height:13px;background:var(--saffron);margin-left:2px;animation:blink2 .9s steps(1) infinite;vertical-align:middle}
+  @keyframes blink2{50%{opacity:0}}
+
+  /* DNA panel */
+  .dna-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
+  .dna-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .dna-row .k{color:var(--mute)}
+  .dna-row .v{font-weight:600;color:#EAF0FF}
+  .dna-row .v.hi{color:var(--saffron)}
+  .flash{animation:flash 1.1s ease}
+  @keyframes flash{0%{background:rgba(245,166,35,.25)}100%{background:transparent}}
+  .holdings{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .hold{font-size:10.5px;padding:4px 10px;border-radius:20px;background:#141a44;border:1px solid var(--line);color:#cdd7f5}
+  .hold.new{border-color:var(--saffron);color:var(--saffron);background:rgba(245,166,35,.08)}
+  .meter{height:7px;border-radius:5px;background:#141a44;overflow:hidden;margin-top:5px}
+  .meter i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--saffron));transition:width .8s ease}
+
+  .foot{max-width:1360px;margin:0 auto;padding:6px 30px 46px;color:var(--mute2);font-size:11.5px;line-height:1.6}
+  .foot a{color:var(--blue-lt);text-decoration:none}
+  .two-col-panels{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:1080px){.stage{grid-template-columns:1fr}.phone{position:static}.two-col-panels{grid-template-columns:1fr}.fleet{grid-template-columns:1fr 1fr}}
+  .kbd{font-size:10px;background:#141a44;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="wheel" id="wheel"><div class="rim"></div><div class="hub"></div></div>
+    <div class="brand">
+      <h1>SBI <span class="s serif">Sarthi</span> <span class="serif" style="color:#8aa0d8;font-weight:500">सारथी</span></h1>
+      <p>Autonomous Agentic Banking Companion · Live orchestration demo</p>
+    </div>
+  </div>
+  <div class="lang-toggle" id="lang">
+    <button data-l="en" class="on">EN</button>
+    <button data-l="hi">हिंदी</button>
+  </div>
+  <div class="live-badge"><span class="pulse"></span> AGENTS LIVE</div>
+</header>
+
+<div class="stage">
+  <!-- PHONE -->
+  <div class="phone">
+    <div class="phone-screen">
+      <div class="yono-top">
+        <div class="ava serif">S</div>
+        <div>
+          <div class="tt">Sarthi</div>
+          <div class="st"><span class="d"></span> your personal banker</div>
+        </div>
+        <div class="yono-brand">Inside<br><b style="color:#cdd7f5">YONO</b></div>
+      </div>
+      <div class="chat" id="chat"></div>
+    </div>
+  </div>
+
+  <!-- CONSOLE -->
+  <div class="console">
+    <div class="scn-head">
+      <span class="lbl">SCENARIO</span>
+      <div class="chips" id="chips"></div>
+      <div class="controls">
+        <button class="btn" id="replay">↻ Reset</button>
+        <button class="btn primary" id="play">▶ Run journey</button>
+      </div>
+    </div>
+
+    <!-- Agent fleet -->
+    <div class="panel">
+      <div class="panel-h"><span class="ic"></span> Agent fleet · supervised multi-agent system</div>
+      <div class="fleet" id="fleet"></div>
+    </div>
+
+    <div class="two-col-panels">
+      <!-- Trace -->
+      <div class="trace-wrap">
+        <div class="trace-top">
+          <span class="dots"><i style="background:#f27e86"></i><i style="background:#f5a623"></i><i style="background:#24c4a8"></i></span>
+          LIVE AGENT TRACE
+          <span style="margin-left:auto;color:var(--mute2);font-weight:500" id="traceCount">0 steps</span>
+        </div>
+        <div class="trace" id="trace"></div>
+      </div>
+
+      <!-- Financial DNA -->
+      <div class="panel">
+        <div class="panel-h"><span class="ic" style="background:var(--saffron)"></span> Financial DNA · shared memory</div>
+        <div class="dna-grid" id="dna"></div>
+        <div style="font-size:10.5px;color:var(--mute2);margin-top:14px;margin-bottom:5px">Product holdings</div>
+        <div class="holdings" id="holdings"></div>
+        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--mute);margin-top:14px">
+          <span>Engagement score</span><span id="engLbl">—</span></div>
+        <div class="meter"><i id="engBar" style="width:8%"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  This is a functional simulation of the Sarthi multi-agent engine — every trace step mirrors the real orchestrator → specialist → compliance flow. It runs fully offline with no API key.
+  The same agent contracts are implemented as Python stubs in <span class="mono" style="color:#cdd7f5">/backend/agents</span>, ready to be wired to a live LLM, RAG index and core-banking tools. &nbsp;·&nbsp;
+  Press <span class="kbd">Space</span> to run the selected journey. &nbsp;·&nbsp; SBI Hackathon @ Global Fintech Fest 2026 — <b style="color:#cdd7f5">Agentic AI &amp; Emerging Tech</b>.
+</div>
+
+<script>
+/* =========================================================================
+   SBI Sarthi — Agentic Orchestration Engine (client-side simulation)
+   Mirrors: Orchestrator (plan/route) -> Specialist agents (tool/RAG) ->
+   Compliance guardrail -> reply, with a shared Financial DNA memory.
+   ========================================================================= */
+
+const AGENTS = [
+  {id:'orch',   nm:'Orchestrator', role:'Intent · plan · route',        acc:'var(--agent-orch)'},
+  {id:'acq',    nm:'Acquisition',  role:'Onboard · conversational KYC',  acc:'var(--agent-acq)'},
+  {id:'adopt',  nm:'Adoption',     role:'Activate · product fit',        acc:'var(--agent-adopt)'},
+  {id:'engage', nm:'Engagement',   role:'Proactive · life-events',       acc:'var(--agent-engage)'},
+  {id:'advise', nm:'Advisory/Txn', role:'Answer & act · banking tools',  acc:'var(--agent-advise)'},
+  {id:'comp',   nm:'Compliance',   role:'Guardrail · RBI · audit',       acc:'var(--agent-comp)'},
+];
+const TAGCLASS = {orch:'t-orch',acq:'t-acq',adopt:'t-adopt',engage:'t-engage',advise:'t-advise',comp:'t-comp',sys:'t-sys'};
+const TAGTEXT  = {orch:'ORCH',acq:'ACQUIRE',adopt:'ADOPT',engage:'ENGAGE',advise:'ADVISE',comp:'COMPLY',sys:'SIGNAL'};
+
+/* ---- Scenario scripts. Beat kinds:
+   sys   -> system signal bubble + trace SIGNAL
+   user  -> customer chat bubble
+   trace -> {agent, kind:'think|tool|rag|route|plan|intent|pass', text}
+   agent -> activate an agent card with a short 'work' label
+   say   -> Sarthi chat bubble {en, hi, voice}
+   dna   -> update memory panel {set:{}, addProduct, newProduct, eng}
+   done  -> mark agents done
+----------------------------------------------------------------------- */
+const SCEN = {
+  ramesh:{
+    label:'Dormant → Working capital', pill:'ENGAGE',
+    dna0:{Name:'Ramesh Kumar', Segment:'Kirana / SME · Varanasi', Language:'Hindi', Status:'Dormant (balance-check only)', Vintage:'4 yrs', 'KYC':'CKYC complete'},
+    products0:['Savings A/c'], eng0:22,
+    beats:[
+      {t:'sys', en:'⚡ Autonomous trigger — no inbound query. Ramesh\u2019s festive inflows +230% over 3 seasons; app usage = balance-check only.', hi:'⚡ स्वचालित संकेत — कोई सवाल नहीं। त्योहारों में जमा +230%, ऐप में सिर्फ बैलेंस देखते हैं।'},
+      {t:'agent', id:'orch', work:'classifying signal…'},
+      {t:'trace', agent:'orch', kind:'intent', text:'Opportunity signal detected (proactive). Intent = <b>working-capital / adoption</b>'},
+      {t:'trace', agent:'orch', kind:'plan',  text:'Plan → Engagement frames outreach · Acquisition checks readiness · Advisory sizes credit · Compliance validates'},
+      {t:'agent', id:'engage', work:'reading Financial DNA…'},
+      {t:'trace', agent:'engage', kind:'think', text:'Life-stage = seasonal SME. Pattern = festive spike ⇒ stock-vs-sales cash gap'},
+      {t:'trace', agent:'engage', kind:'tool', text:'memory.read(txn_pattern, 12mo) · vernacular=Hindi · channel=voice'},
+      {t:'say', en:'Namaste Ramesh ji 🙏 Your festive sales are climbing. Shall I show a small business loan for stock — without visiting a branch?', hi:'रमेश जी, नमस्ते 🙏 त्योहारों में आपकी बिक्री बढ़ रही है। क्या मैं स्टॉक के लिए एक छोटा बिज़नेस लोन दिखाऊँ — बिना ब्रांच जाए?', voice:true},
+      {t:'user', en:'Yes, show me', hi:'हाँ, दिखाओ'},
+      {t:'agent', id:'acq', work:'verifying eligibility…'},
+      {t:'trace', agent:'acq', kind:'tool', text:'ckyc.status()=complete · account_vintage=4y · no active default'},
+      {t:'agent', id:'advise', work:'sizing credit line…'},
+      {t:'trace', agent:'advise', kind:'rag', text:'retrieve → \u201cSME festive working-capital line\u201d · rate slab · limits · docs'},
+      {t:'trace', agent:'advise', kind:'tool', text:'credit_engine.assess(income_proxy=inflow_12mo) → pre-approved ₹50,000'},
+      {t:'agent', id:'comp', work:'validating action…'},
+      {t:'trace', agent:'comp', kind:'pass', text:'✔ within pre-approved band ✔ suitability ok ✔ consent captured ✔ explanation attached'},
+      {t:'say', en:'You\u2019re eligible for up to ₹50,000. EMI ≈ ₹2,300/mo. Say \u201cYes\u201d to approve.', hi:'आप ₹50,000 तक के लिए योग्य हैं। EMI ≈ ₹2,300/माह। मंज़ूर करने के लिए \u201cहाँ\u201d बोलें।', voice:true},
+      {t:'user', en:'Yes', hi:'हाँ'},
+      {t:'agent', id:'advise', work:'disbursing…'},
+      {t:'trace', agent:'advise', kind:'tool', text:'disburse_to_account(₹50,000) · optional escrow → stock vendor'},
+      {t:'dna', set:{Status:'Active borrower'}, newProduct:'Business Credit Line', eng:71},
+      {t:'trace', agent:'comp', kind:'pass', text:'audit_log.write(journey_id, plan, tools, outcome) — immutable & reversible'},
+      {t:'say', en:'Done ✅ ₹50,000 credited to your account. Happy festivals!', hi:'हो गया ✅ ₹50,000 आपके खाते में जमा। शुभ त्योहार!', voice:true},
+      {t:'trace', agent:'orch', kind:'think', text:'Outcome: dormant → active borrower. Acquire + Adopt + Engage in <b>one journey</b>. No human escalation needed'},
+      {t:'done'}
+    ]
+  },
+  anjali:{
+    label:'New prospect onboarding', pill:'ACQUIRE',
+    dna0:{Name:'Anjali (prospect)', Segment:'First-time · student', Language:'Hindi', Status:'Not a customer', Vintage:'—', 'KYC':'Not started'},
+    products0:[], eng0:5,
+    beats:[
+      {t:'sys', en:'Inbound — new prospect on YONO landing. Age 24, first bank account, prefers Hindi, low digital familiarity.', hi:'नया ग्राहक — YONO पर पहली बार। उम्र 24, पहला खाता, हिंदी पसंद, कम डिजिटल अनुभव।'},
+      {t:'agent', id:'orch', work:'routing…'},
+      {t:'trace', agent:'orch', kind:'intent', text:'Intent = <b>account_opening</b>. Lead agent = Acquisition. Risk = KYC drop-off'},
+      {t:'agent', id:'acq', work:'planning low-friction flow…'},
+      {t:'trace', agent:'acq', kind:'think', text:'Strategy: voice-guided, jargon-free, one question at a time to prevent abandonment'},
+      {t:'say', en:'Hi! I\u2019m Sarthi, your banking companion. Let\u2019s open your account in 2 minutes — just a few simple questions.', hi:'नमस्ते! मैं सारथी, आपकी बैंकिंग साथी। 2 मिनट में खाता खोलते हैं — बस कुछ आसान सवाल।', voice:true},
+      {t:'user', en:'Okay', hi:'ठीक है'},
+      {t:'trace', agent:'acq', kind:'tool', text:'aadhaar.ekyc(consent=explicit) → identity verified'},
+      {t:'agent', id:'comp', work:'checking PII handling…'},
+      {t:'trace', agent:'comp', kind:'pass', text:'✔ consent artefact stored ✔ PII minimised ✔ purpose-bound'},
+      {t:'trace', agent:'acq', kind:'tool', text:'pan.link() · video_kyc.schedule(instant) → passed'},
+      {t:'dna', set:{Status:'Onboarding', 'KYC':'e-KYC + Video done', Vintage:'today'}, eng:34},
+      {t:'say', en:'Your Savings Account is ready 🎉 Debit card & UPI are set. I\u2019ll help you use them next.', hi:'आपका बचत खाता तैयार है 🎉 डेबिट कार्ड और UPI चालू। अब मैं इन्हें इस्तेमाल करना सिखाऊँगी।', voice:true},
+      {t:'dna', set:{Name:'Anjali Sharma', Segment:'New customer · student'}, newProduct:'Savings A/c', eng:48},
+      {t:'agent', id:'adopt', work:'queuing first-use nudge…'},
+      {t:'trace', agent:'adopt', kind:'think', text:'Handoff: schedule guided first-UPI + goal-based RD nudge for next session'},
+      {t:'trace', agent:'orch', kind:'think', text:'Outcome: prospect → onboarded customer with zero branch visit; adoption journey armed'},
+      {t:'done'}
+    ]
+  },
+  vikram:{
+    label:'Idle balance → Adoption', pill:'ADOPT',
+    dna0:{Name:'Vikram Rao', Segment:'Salaried · Bengaluru', Language:'English', Status:'Active · single-product', Vintage:'6 yrs', 'KYC':'complete'},
+    products0:['Savings A/c'], eng0:40,
+    beats:[
+      {t:'sys', en:'Inbound — Vikram opens YONO, checks balance, about to close (session 4s). ₹1.8L idle in savings @ 2.7%.', hi:'ग्राहक — विक्रम ने YONO खोला, बैलेंस देखा, बंद करने वाला है। ₹1.8L बचत में बेकार, 2.7% ब्याज।'},
+      {t:'agent', id:'orch', work:'reading context…'},
+      {t:'trace', agent:'orch', kind:'intent', text:'No query, but exit-risk + idle-cash signal. Intent = <b>proactive_adoption</b>'},
+      {t:'agent', id:'adopt', work:'scoring product fit…'},
+      {t:'trace', agent:'adopt', kind:'think', text:'Holdings = Savings only. Idle ₹1.8L. Eligible: sweep-FD, SIP, term insurance. Unused: UPI autopay'},
+      {t:'trace', agent:'adopt', kind:'rag', text:'retrieve suitable-only products · rank by benefit − friction → best fit = auto-sweep FD'},
+      {t:'agent', id:'comp', work:'anti-mis-sell check…'},
+      {t:'trace', agent:'comp', kind:'pass', text:'✔ single best-fit (no spray) ✔ suitable to risk profile ✔ transparent returns'},
+      {t:'say', en:'Vikram, ₹1.8L is sitting idle. A 1-tap auto-sweep FD earns ~6.8% and stays instantly withdrawable. Turn it on?', hi:'विक्रम, ₹1.8L बेकार पड़ा है। 1-टैप ऑटो-स्वीप FD ~6.8% देगा और तुरंत निकाला जा सकता है। चालू करें?', voice:false},
+      {t:'user', en:'How much more will I earn?', hi:'कितना ज़्यादा मिलेगा?'},
+      {t:'agent', id:'advise', work:'computing…'},
+      {t:'trace', agent:'advise', kind:'tool', text:'calc.delta(1.8L, 2.7%→6.8%, 1y) → ≈ ₹7,380 extra/yr, zero lock-in'},
+      {t:'say', en:'About ₹7,380 more this year — with no lock-in. Shall I enable it?', hi:'इस साल लगभग ₹7,380 ज़्यादा — बिना किसी लॉक-इन के। चालू कर दूँ?', voice:false},
+      {t:'user', en:'Yes, enable it', hi:'हाँ, चालू करो'},
+      {t:'trace', agent:'advise', kind:'tool', text:'sweep_fd.enable(threshold=₹25k) → active'},
+      {t:'dna', set:{Status:'Active · multi-product'}, newProduct:'Auto-sweep FD', eng:66},
+      {t:'say', en:'Enabled ✅ Your savings now work harder automatically. I\u2019ll check back if a better option appears.', hi:'चालू ✅ अब आपकी बचत अपने आप ज़्यादा कमाएगी। बेहतर विकल्प आने पर बताऊँगी।', voice:false},
+      {t:'trace', agent:'orch', kind:'think', text:'Outcome: idle single-product user → activated multi-product, in <10s of attention'},
+      {t:'done'}
+    ]
+  }
+};
+
+/* ---------- Render scaffolding ---------- */
+let LANG='en', current='ramesh', timer=null, running=false, idx=0;
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const chat=$('#chat'), trace=$('#trace'), fleetEl=$('#fleet'), chipsEl=$('#chips'),
+      dnaEl=$('#dna'), holdEl=$('#holdings'), engBar=$('#engBar'), engLbl=$('#engLbl'),
+      traceCount=$('#traceCount');
+let stepCount=0;
+
+// wheel spokes
+(function(){const w=$('#wheel');for(let i=0;i<8;i++){const a=i/8*2*Math.PI;
+  const sp=document.createElement('i');sp.style.transform=`translate(-1px,0) rotate(${i*45}deg)`;w.appendChild(sp);
+  const d=document.createElement('div');d.className='dot';d.style.background=i%2?'var(--saffron)':'var(--blue)';
+  d.style.left=(50+Math.cos(a)*46)+'%';d.style.top=(50+Math.sin(a)*46)+'%';d.style.transform='translate(-50%,-50%)';w.appendChild(d);}})();
+
+// fleet
+AGENTS.forEach(a=>{
+  const el=document.createElement('div');el.className='agent';el.id='ag-'+a.id;el.style.setProperty('--acc',a.acc);
+  el.innerHTML=`<div class="nm"><span class="orb"></span>${a.nm}</div><div class="rl">${a.role}</div><div class="work" id="wk-${a.id}"></div>`;
+  fleetEl.appendChild(el);
+});
+// chips
+Object.entries(SCEN).forEach(([k,s])=>{
+  const c=document.createElement('div');c.className='chip'+(k===current?' on':'');c.dataset.k=k;
+  c.innerHTML=`${s.label} <span class="pill">${s.pill}</span>`;
+  c.onclick=()=>{if(running)return;current=k;$$('.chip').forEach(x=>x.classList.toggle('on',x.dataset.k===k));reset();};
+  chipsEl.appendChild(c);
+});
+
+function reset(){
+  clearTimeout(timer);running=false;idx=0;stepCount=0;
+  chat.innerHTML='';trace.innerHTML='';traceCount.textContent='0 steps';
+  $('#play').disabled=false;$('#play').innerHTML='▶ Run journey';
+  AGENTS.forEach(a=>{const el=$('#ag-'+a.id);el.classList.remove('active','done');$('#wk-'+a.id).textContent='';});
+  const s=SCEN[current];
+  // DNA
+  window._dna=JSON.parse(JSON.stringify(s.dna0));
+  window._products=[...s.products0];
+  renderDNA(); renderHoldings(); setEng(s.eng0,false);
+  // ready hint bubble
+  addBubble('sys', LANG==='en'?'Select a journey and press Run. Watch the agents think on the right.':'यात्रा चुनें और Run दबाएँ। दाईं ओर एजेंट्स को सोचते देखें।');
+}
+function renderDNA(){
+  dnaEl.innerHTML='';
+  Object.entries(window._dna).forEach(([k,v])=>{
+    const hi = ['Status'].includes(k);
+    dnaEl.insertAdjacentHTML('beforeend',
+      `<div class="dna-row"><span class="k">${k}</span><span class="v ${hi?'hi':''}" data-k="${k}">${v}</span></div>`);
+  });
+}
+function renderHoldings(){
+  holdEl.innerHTML = window._products.length
+    ? window._products.map(p=>`<span class="hold ${p.__new?'new':''}">${p.name||p}</span>`).join('')
+    : '<span class="hold" style="opacity:.5">none yet</span>';
+}
+function setEng(v,anim=true){engLbl.textContent=v+' / 100';engBar.style.width=Math.max(4,v)+'%';}
+
+/* ---------- Chat + trace helpers ---------- */
+function scroll(el){el.scrollTop=el.scrollHeight;}
+function addBubble(kind,html,voice){
+  // remove ready hint on first real content
+  const hint=chat.querySelector('.b-sys.hint');
+  const b=document.createElement('div');
+  if(kind==='sys'){b.className='bubble b-sys'+(html.includes('Select a journey')||html.includes('यात्रा चुनें')?' hint':'');b.innerHTML=html;}
+  else if(kind==='user'){b.className='bubble b-user';b.textContent=html;}
+  else{b.className='bubble b-sarthi';b.innerHTML=(voice?`<div class="voice-tag">🎙 ${LANG==='en'?'voice':'बोलकर'} <span class="wave"><span></span><span></span><span></span><span></span></span></div>`:'')+html;}
+  chat.appendChild(b);scroll(chat);
+}
+function typing(cb,ms){
+  const t=document.createElement('div');t.className='typing';t.innerHTML='<i></i><i></i><i></i>';
+  chat.appendChild(t);scroll(chat);
+  setTimeout(()=>{t.remove();cb();},ms);
+}
+function addTrace(agent,kind,text){
+  stepCount++;traceCount.textContent=stepCount+' steps';
+  const row=document.createElement('div');row.className='tr kind-'+kind+(kind==='pass'?' pass':'');
+  row.innerHTML=`<span class="tag ${TAGCLASS[agent]}">${TAGTEXT[agent]}</span><span class="msg">${text}</span>`;
+  trace.appendChild(row);scroll(trace);
+}
+function activate(id,work){
+  AGENTS.forEach(a=>$('#ag-'+a.id).classList.remove('active'));
+  const el=$('#ag-'+id);el.classList.add('active');$('#wk-'+id).textContent=work||'';
+}
+
+/* ---------- Player ---------- */
+function play(){
+  if(running)return;
+  // clear hint
+  const hint=chat.querySelector('.b-sys.hint'); if(hint) hint.remove();
+  running=true;$('#play').disabled=true;$('#play').innerHTML='● Running…';
+  step();
+}
+function step(){
+  const beats=SCEN[current].beats;
+  if(idx>=beats.length){finish();return;}
+  const b=beats[idx++];
+  let delay=650;
+  switch(b.t){
+    case 'sys':   addBubble('sys','⚡ '+txt(b)); addTrace('sys','think', txt(b)); delay=1200; break;
+    case 'user':  addBubble('user',txt(b)); delay=700; break;
+    case 'agent': activate(b.id,b.work); delay=560; break;
+    case 'trace': addTrace(b.agent,b.kind,b.text); delay=b.kind==='pass'?1050:820; break;
+    case 'say':
+      delay=0;
+      typing(()=>{addBubble('sarthi',txt(b),b.voice); timer=setTimeout(step,900);}, 950);
+      return;
+    case 'dna':   applyDNA(b); delay=700; break;
+    case 'done':  finish(); return;
+  }
+  timer=setTimeout(step,delay);
+}
+function txt(b){return LANG==='en'?b.en:(b.hi||b.en);}
+function applyDNA(b){
+  if(b.set){Object.entries(b.set).forEach(([k,v])=>{window._dna[k]=v;});renderDNA();
+    Object.keys(b.set).forEach(k=>{const el=dnaEl.querySelector(`[data-k="${k}"]`);if(el){el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1100);}});
+  }
+  if(b.newProduct){window._products.push({name:b.newProduct,__new:true});renderHoldings();
+    const last=holdEl.querySelector('.hold.new:last-child');if(last)last.classList.add('flash');}
+  if(b.eng!=null)setEng(b.eng);
+}
+function finish(){
+  running=false;$('#play').disabled=false;$('#play').innerHTML='✓ Replay journey';
+  AGENTS.forEach(a=>{const el=$('#ag-'+a.id);el.classList.remove('active');});
+  ['orch','comp'].forEach(id=>$('#ag-'+id).classList.add('done'));
+  const s=SCEN[current];
+  // mark used agents done
+  s.beats.forEach(b=>{if(b.t==='agent')$('#ag-'+b.id).classList.add('done');});
+}
+
+/* ---------- Controls ---------- */
+$('#play').onclick=()=>{ if($('#play').innerHTML.includes('Replay')){reset();setTimeout(play,120);} else play(); };
+$('#replay').onclick=reset;
+$('#lang').onclick=e=>{const b=e.target.closest('button');if(!b)return;LANG=b.dataset.l;
+  $$('#lang button').forEach(x=>x.classList.toggle('on',x===b));};
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();
+  if($('#play').innerHTML.includes('Replay')){reset();setTimeout(play,120);}else play();}});
+
+reset();
+</script>
+</body>
+</html>
