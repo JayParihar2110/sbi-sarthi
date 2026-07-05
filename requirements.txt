@@ -1,0 +1,11 @@
+# Core system runs with zero third-party deps (pure standard library).
+# Install these only to expose the HTTP API and to wire a real LLM / RAG.
+
+fastapi>=0.111        # optional — HTTP surface for /journey
+uvicorn>=0.30         # optional — ASGI server
+pydantic>=2.7         # request models
+
+# --- wire these for a live (non-mock) deployment ---
+# anthropic>=0.34     # or an open-weight / on-prem model client
+# langgraph>=0.2      # supervisor/specialist orchestration
+# pgvector             # agentic RAG vector store (or milvus / qdrant)
